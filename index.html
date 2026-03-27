@@ -151,12 +151,15 @@
     border: 3px solid transparent;
     transition: all 0.2s;
     background: var(--primary-light);
+    overflow: hidden;
+    flex-shrink: 0;
   }
+  .child-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .child-chip.active .child-avatar {
     border-color: var(--primary);
-    background: var(--primary);
     box-shadow: 0 4px 12px rgba(108,99,255,0.4);
   }
+  .child-chip.active .child-avatar:not(:has(img)) { background: var(--primary); }
   .child-chip span {
     font-size: 11px;
     font-weight: 700;
@@ -661,7 +664,10 @@
   <div class="page active" id="page-home">
     <div class="child-selector" id="childSelector"></div>
     <div class="star-card" id="starCard">
-      <div class="child-name" id="scName">Pilih Anak</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div id="scAvatar" style="font-size:36px;line-height:1;flex-shrink:0;">😊</div>
+        <div class="child-name" id="scName">Pilih Anak</div>
+      </div>
       <div class="star-count" id="scCount">0 ⭐</div>
       <div class="star-label">bintang terkumpul</div>
       <div class="star-bar-wrap">
@@ -740,14 +746,38 @@
 
     <div class="admin-section">
       <div class="admin-section-title">Kelola Anak</div>
+
+      <!-- Avatar preview + upload -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+        <div id="newChildAvatarPreview" onclick="document.getElementById('photoInput').click()"
+          style="width:64px;height:64px;border-radius:50%;background:var(--primary-light);border:2.5px dashed var(--primary);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;font-size:30px;">
+          😊
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:13px;color:var(--text);margin-bottom:4px;">Foto Profil</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="document.getElementById('photoInput').click()"
+              style="background:var(--primary-light);color:var(--primary);border:none;border-radius:10px;padding:7px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;">
+              📷 Upload Foto
+            </button>
+            <button onclick="clearNewPhoto()"
+              style="background:var(--bg);color:var(--text-muted);border:1.5px solid var(--border);border-radius:10px;padding:7px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">
+              Hapus
+            </button>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-weight:600;">atau ketik emoji di bawah jika tidak upload foto</div>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+      </div>
+
       <div class="input-row">
         <div>
           <div class="input-label">Nama Anak</div>
           <input class="input-field" id="newChildName" placeholder="Nama anak...">
         </div>
         <div>
-          <div class="input-label">Avatar</div>
-          <input class="input-field" id="newChildEmoji" placeholder="😊" style="width:70px;text-align:center;font-size:20px;">
+          <div class="input-label">Emoji (opsional)</div>
+          <input class="input-field" id="newChildEmoji" placeholder="😊" style="width:76px;text-align:center;font-size:20px;">
         </div>
         <button class="btn-primary" onclick="addChild()" style="margin-top:22px;">+ Tambah</button>
       </div>
@@ -771,6 +801,18 @@
           <div class="emoji-opt" onclick="selectEmoji('act','💪',this)">💪</div>
           <div class="emoji-opt" onclick="selectEmoji('act','🎨',this)">🎨</div>
           <div class="emoji-opt" onclick="selectEmoji('act','🌟',this)">🌟</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🛁',this)">🛁</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🦷',this)">🦷</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🌿',this)">🌿</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🐕',this)">🐕</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🚴',this)">🚴</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','✏️',this)">✏️</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🎯',this)">🎯</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🏊',this)">🏊</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🍎',this)">🍎</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','💤',this)">💤</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🗑️',this)">🗑️</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🤝',this)">🤝</div>
         </div>
       </div>
       <div class="input-row">
@@ -797,6 +839,12 @@
           <div class="emoji-opt" onclick="selectEmoji('pun','🚫',this)">🚫</div>
           <div class="emoji-opt" onclick="selectEmoji('pun','😔',this)">😔</div>
           <div class="emoji-opt" onclick="selectEmoji('pun','🙅',this)">🙅</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','😠',this)">😠</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','🤦',this)">🤦</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','😭',this)">😭</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','🗣️',this)">🗣️</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','💢',this)">💢</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','🤐',this)">🤐</div>
         </div>
       </div>
       <div class="input-row">
@@ -830,6 +878,22 @@
           <div class="emoji-opt" onclick="selectEmoji('rwd','🎡',this)">🎡</div>
           <div class="emoji-opt" onclick="selectEmoji('rwd','📱',this)">📱</div>
           <div class="emoji-opt" onclick="selectEmoji('rwd','🏖️',this)">🏖️</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎠',this)">🎠</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎪',this)">🎪</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎁',this)">🎁</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🏆',this)">🏆</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎀',this)">🎀</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🍰',this)">🍰</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🍫',this)">🍫</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎢',this)">🎢</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🚀',this)">🚀</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎲',this)">🎲</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🖼️',this)">🖼️</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎤',this)">🎤</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🏄',this)">🏄</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎭',this)">🎭</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🌈',this)">🌈</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','⚽',this)">⚽</div>
         </div>
       </div>
       <div class="input-row">
@@ -898,7 +962,7 @@
     <div id="voucherContent"></div>
     <div style="padding:16px 20px 20px;display:flex;gap:10px;">
       <button class="confirm-btn no" style="flex:1" onclick="closeVoucher()">Tutup</button>
-      <button class="confirm-btn yes" style="flex:1" onclick="printVoucher()">🖨️ Cetak / Simpan</button>
+      <button class="confirm-btn yes" style="flex:1" onclick="printVoucher()">💾 Simpan JPG</button>
     </div>
   </div>
 </div>
@@ -906,8 +970,8 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-// ── DATA STORE ──────────────────────────────────────────────
 const DEFAULT_PIN = '1234';
 
 const defaultData = {
@@ -944,6 +1008,7 @@ let selectedActEmoji = '🧹';
 let selectedPunEmoji = '⚠️';
 let selectedRwdEmoji = '🎬';
 let confirmCallback = null;
+let newChildPhoto = null; // base64 for new child being added
 
 function save() {
   localStorage.setItem('bintangPintar', JSON.stringify(data));
@@ -971,13 +1036,20 @@ function renderAll() {
   renderAdminLists();
 }
 
+function avatarHtml(c, size=52, fontSize=26) {
+  if (c.photo) {
+    return `<div class="child-avatar" style="width:${size}px;height:${size}px;"><img src="${c.photo}" alt="${c.name}"></div>`;
+  }
+  return `<div class="child-avatar" style="width:${size}px;height:${size}px;font-size:${fontSize}px;">${c.emoji || '😊'}</div>`;
+}
+
 function renderChildSelectors() {
   ['childSelector','childSelector2','childSelector3','childSelector4'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.innerHTML = data.children.map(c => `
       <div class="child-chip ${c.id === selectedChild ? 'active' : ''}" onclick="selectChild(${c.id})">
-        <div class="child-avatar">${c.emoji}</div>
+        ${avatarHtml(c)}
         <span>${c.name.split(' ')[0]}</span>
       </div>`).join('');
   });
@@ -1026,6 +1098,15 @@ function renderStarCard() {
   document.getElementById('scPercent').textContent = pct + '%';
   document.getElementById('scBar').style.width = pct + '%';
   document.getElementById('rewardStarCount').textContent = child.stars;
+  // Update star card avatar
+  const scAvatar = document.getElementById('scAvatar');
+  if (scAvatar) {
+    if (child.photo) {
+      scAvatar.innerHTML = `<img src="${child.photo}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.5);">`;
+    } else {
+      scAvatar.textContent = child.emoji || '😊';
+    }
+  }
 }
 
 function renderRecentHistory() {
@@ -1092,12 +1173,19 @@ function renderHistory() {
   el.innerHTML = items.map(h => {
     let cls = h.type === 'punishment' ? 'minus' : (h.type === 'redeem' ? 'minus' : 'plus');
     let sign = h.type === 'punishment' || h.type === 'redeem' ? '-' : '+';
-    return `<div class="history-item">
+    const voucherBtn = h.type === 'redeem'
+      ? `<button onclick="replayVoucher(${h.id})" title="Lihat Voucher"
+           style="background:var(--primary-light);color:var(--primary);border:none;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;flex-shrink:0;">
+           🎟️
+         </button>`
+      : '';
+    return `<div class="history-item" style="gap:8px;">
       <div class="hist-icon">${h.emoji}</div>
       <div class="hist-info">
         <div class="hist-name">${h.name}</div>
         <div class="hist-meta">${h.date} • ${h.childName}</div>
       </div>
+      ${voucherBtn}
       <div class="hist-stars ${cls}">${sign}${h.stars}⭐</div>
     </div>`;
   }).join('');
@@ -1119,9 +1207,12 @@ function renderLeaderboard() {
     const cls = rank === 1 ? 'top-1' : '';
     const badgeCls = rank <= 3 ? `rank-${rank}` : 'rank-other';
     const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    const avatarEl = c.photo
+      ? `<img src="${c.photo}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+      : `<div class="leader-avatar">${c.emoji || '😊'}</div>`;
     return `<div class="leader-row ${cls}">
       <div class="rank-badge ${badgeCls}">${medal}</div>
-      <div class="leader-avatar">${c.emoji}</div>
+      ${avatarEl}
       <div class="leader-name">${c.name}</div>
       <div class="leader-stars">${c.stars} ⭐</div>
     </div>`;
@@ -1151,13 +1242,27 @@ function renderRewards() {
 function renderAdminLists() {
   // Children
   const cl = document.getElementById('childManageList');
-  if (cl) cl.innerHTML = data.children.map(c => `
-    <div class="manage-item">
-      <div class="manage-item-icon">${c.emoji}</div>
+  if (cl) cl.innerHTML = data.children.map(c => {
+    const av = c.photo
+      ? `<img src="${c.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+      : `<div class="manage-item-icon">${c.emoji || '😊'}</div>`;
+    return `<div class="manage-item">
+      <div style="position:relative;cursor:pointer;" onclick="editChildPhoto(${c.id})" title="Ganti foto">
+        ${av}
+        <div style="position:absolute;bottom:-2px;right:-2px;background:var(--primary);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;">📷</div>
+      </div>
       <div class="manage-item-name">${c.name}</div>
       <div class="manage-item-stars">${c.stars} ⭐</div>
       <button class="btn-danger" onclick="removeChild(${c.id})">Hapus</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  // hidden file input for editing existing child photo
+  if (cl && !document.getElementById('editPhotoInput')) {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.id = 'editPhotoInput'; inp.accept = 'image/*'; inp.style.display = 'none';
+    inp.onchange = e => handleEditPhotoUpload(e);
+    document.body.appendChild(inp);
+  }
   // Activities
   const al = document.getElementById('actManageList');
   if (al) al.innerHTML = data.activities.map(a => `
@@ -1253,7 +1358,10 @@ function doRedeem(id) {
     stars: rwd.cost,
     type: 'redeem',
     date: now.toLocaleDateString('id-ID'),
-    voucherId
+    dateStr,
+    timeStr,
+    voucherId,
+    remainingAfter: child.stars
   });
   save();
   renderAll();
@@ -1281,7 +1389,10 @@ function showVoucher({ child, rwd, dateStr, timeStr, voucherId, remaining }) {
       <table style="width:100%;font-family:'Nunito',sans-serif;font-size:13px;border-collapse:collapse;">
         <tr>
           <td style="color:#8A86B8;font-weight:700;padding:5px 0;">Untuk</td>
-          <td style="text-align:right;font-weight:800;color:#2D2D4E;padding:5px 0;">${child.emoji} ${child.name}</td>
+          <td style="text-align:right;font-weight:800;color:#2D2D4E;padding:5px 0;display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+            ${child.photo ? `<img src="${child.photo}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;">` : `<span>${child.emoji || '😊'}</span>`}
+            ${child.name}
+          </td>
         </tr>
         <tr>
           <td style="color:#8A86B8;font-weight:700;padding:5px 0;">Tanggal</td>
@@ -1313,28 +1424,58 @@ function closeVoucher() {
   showToast('🎉 Selamat menikmati hadiahnya!');
 }
 
+function replayVoucher(histId) {
+  const h = data.history.find(x => x.id === histId);
+  if (!h) return;
+  const child = data.children.find(c => c.id === h.childId) || { name: h.childName, emoji: '😊', photo: null };
+  // Reconstruct reward name from history (strip the "🎁 Tukar: " prefix)
+  const rwdName = h.name.replace(/^🎁 Tukar: /, '');
+  const rwd = { name: rwdName, emoji: h.emoji, cost: h.stars };
+  // Compute remaining stars at time of redeem — approximate from history
+  // Just show the stored remaining if present, else show current
+  const remaining = (h.remainingAfter !== undefined) ? h.remainingAfter : child.stars;
+  const dateStr = h.dateStr || h.date;
+  const timeStr = h.timeStr || '';
+  const voucherId = h.voucherId || ('BP-' + String(h.id).padStart(5,'0'));
+  showVoucher({ child, rwd, dateStr, timeStr, voucherId, remaining });
+}
+
 function printVoucher() {
-  const content = document.getElementById('voucherContent').innerHTML;
-  const html = `<!DOCTYPE html><html><head>
-    <meta charset="UTF-8">
-    <title>Voucher Bintang Pintar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-      * { margin:0; padding:0; box-sizing:border-box; }
-      body { font-family:'Nunito',sans-serif; background:#f0f0f0; display:flex; justify-content:center; padding:20px; }
-      .wrap { background:white; border-radius:20px; overflow:hidden; max-width:380px; width:100%; box-shadow:0 8px 40px rgba(0,0,0,0.15); }
-    </style>
-  </head><body><div class="wrap">${content}</div></body></html>`;
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'voucher-bintang-pintar.html';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('📥 Voucher berhasil diunduh!');
+  const el = document.getElementById('voucherContent');
+  const btn = document.querySelector('#voucherModal .confirm-btn.yes');
+  if (btn) { btn.textContent = '⏳ Membuat gambar...'; btn.disabled = true; }
+  // Off-screen clone so we can set fixed width without layout shifts
+  const clone = el.cloneNode(true);
+  clone.style.cssText = 'position:fixed;left:-9999px;top:0;width:360px;background:white;font-family:Nunito,sans-serif;';
+  document.body.appendChild(clone);
+  setTimeout(() => {
+    html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      width: 360,
+      windowWidth: 360
+    }).then(canvas => {
+      document.body.removeChild(clone);
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'voucher-bintang-pintar.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        if (btn) { btn.textContent = '💾 Simpan JPG'; btn.disabled = false; }
+        showToast('🖼️ Voucher berhasil disimpan sebagai JPG!');
+      }, 'image/jpeg', 0.95);
+    }).catch(() => {
+      document.body.removeChild(clone);
+      if (btn) { btn.textContent = '💾 Simpan JPG'; btn.disabled = false; }
+      showToast('❌ Gagal membuat gambar, coba lagi.');
+    });
+  }, 100);
 }
 
 function closeConfirm() {
@@ -1346,14 +1487,65 @@ function doConfirm() {
   closeConfirm();
 }
 
+// ── PHOTO UPLOAD ──────────────────────────────────────────────
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    newChildPhoto = e.target.result;
+    const preview = document.getElementById('newChildAvatarPreview');
+    if (preview) {
+      preview.innerHTML = `<img src="${newChildPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function clearNewPhoto() {
+  newChildPhoto = null;
+  const preview = document.getElementById('newChildAvatarPreview');
+  if (preview) preview.innerHTML = '😊';
+}
+
+let editingChildId = null;
+function editChildPhoto(id) {
+  editingChildId = id;
+  const inp = document.getElementById('editPhotoInput');
+  if (inp) inp.click();
+}
+
+function handleEditPhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file || !editingChildId) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const child = data.children.find(c => c.id === editingChildId);
+    if (child) {
+      child.photo = e.target.result;
+      save(); renderAll();
+      showToast('✅ Foto diperbarui!');
+    }
+    editingChildId = null;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
 // ── ADMIN ────────────────────────────────────────────────────
 function addChild() {
   const name = document.getElementById('newChildName').value.trim();
   const emoji = document.getElementById('newChildEmoji').value.trim() || '😊';
   if (!name) return showToast('⚠️ Masukkan nama anak!');
-  data.children.push({ id: data.nextId++, name, emoji, stars: 0 });
+  const child = { id: data.nextId++, name, emoji, stars: 0 };
+  if (newChildPhoto) child.photo = newChildPhoto;
+  data.children.push(child);
   document.getElementById('newChildName').value = '';
   document.getElementById('newChildEmoji').value = '';
+  newChildPhoto = null;
+  const preview = document.getElementById('newChildAvatarPreview');
+  if (preview) preview.innerHTML = '😊';
   save(); renderAll();
   showToast(`✅ ${name} ditambahkan!`);
 }
