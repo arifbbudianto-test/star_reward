@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6C63FF">
+<meta name="description" content="Aplikasi Reward Bintang untuk Anak">
+<title>Bintang Pintar</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #6C63FF;
+    --primary-light: #EEF0FF;
+    --secondary: #FF6B9D;
+    --accent: #FFD93D;
+    --danger: #FF4757;
+    --danger-light: #FFF0F1;
+    --success: #2ED573;
+    --success-light: #EDFFF4;
+    --bg: #F8F7FF;
+    --card: #FFFFFF;
+    --text: #2D2D4E;
+    --text-muted: #8A86B8;
+    --border: #E8E6FF;
+    --shadow: 0 4px 20px rgba(108,99,255,0.12);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--primary);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.3);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+  .app-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: white;
+    letter-spacing: 0.5px;
+  }
+  .admin-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 6px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .admin-btn:hover { background: rgba(255,255,255,0.3); }
+
+  /* NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 2px solid var(--border);
+    display: flex;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+  .nav-btn .icon { font-size: 22px; line-height: 1; }
+  .nav-btn.active { color: var(--primary); }
+
+  /* MAIN CONTENT */
+  .main {
+    padding: 16px 16px 90px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* PAGE */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: var(--primary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* CHILD SELECTOR */
+  .child-selector {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 18px;
+    scrollbar-width: none;
+  }
+  .child-selector::-webkit-scrollbar { display: none; }
+  .child-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .child-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+    background: var(--primary-light);
+  }
+  .child-chip.active .child-avatar {
+    border-color: var(--primary);
+    background: var(--primary);
+    box-shadow: 0 4px 12px rgba(108,99,255,0.4);
+  }
+  .child-chip span {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .child-chip.active span { color: var(--primary); }
+
+  /* STAR CARD */
+  .star-card {
+    background: linear-gradient(135deg, #6C63FF 0%, #9B8FFF 100%);
+    border-radius: var(--radius);
+    padding: 20px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .star-card::before {
+    content: '⭐';
+    position: absolute;
+    right: -10px; top: -10px;
+    font-size: 80px;
+    opacity: 0.15;
+  }
+  .star-card .child-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 4px;
+  }
+  .star-count {
+    font-family: 'Fredoka One', cursive;
+    font-size: 52px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .star-label { font-size: 14px; opacity: 0.8; font-weight: 600; }
+  .star-bar-wrap { margin-top: 14px; }
+  .star-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .star-bar {
+    background: rgba(255,255,255,0.25);
+    border-radius: 20px;
+    height: 10px;
+    overflow: hidden;
+  }
+  .star-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+  }
+
+  /* QUICK ACTIONS */
+  .quick-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .quick-card {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .quick-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .quick-card .q-icon { font-size: 28px; }
+  .quick-card .q-label { font-weight: 800; font-size: 13px; color: var(--text); }
+  .quick-card .q-sub { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+  /* ACTIVITY LIST */
+  .activity-item {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .activity-item:hover { transform: translateX(4px); border-color: var(--primary); }
+  .activity-item.punishment { border-color: var(--danger-light); }
+  .activity-item.punishment:hover { border-color: var(--danger); }
+  .act-icon { font-size: 30px; flex-shrink: 0; }
+  .act-info { flex: 1; }
+  .act-name { font-weight: 800; font-size: 14px; }
+  .act-desc { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+  .act-stars {
+    display: flex; align-items: center; gap: 4px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+  }
+  .act-stars.plus { color: var(--primary); }
+  .act-stars.minus { color: var(--danger); }
+
+  /* HISTORY */
+  .history-item {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    border: 2px solid var(--border);
+  }
+  .hist-icon { font-size: 26px; flex-shrink: 0; }
+  .hist-info { flex: 1; min-width: 0; }
+  .hist-name { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hist-meta { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+  .hist-stars { font-family: 'Fredoka One', cursive; font-size: 15px; flex-shrink: 0; }
+  .hist-stars.plus { color: var(--primary); }
+  .hist-stars.minus { color: var(--danger); }
+
+  /* LEADERBOARD */
+  .leader-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 2px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .leader-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .leader-row:last-child { border-bottom: none; }
+  .leader-row.top-1 { background: linear-gradient(90deg, #FFF8E1, white); }
+  .rank-badge {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .rank-1 { background: #FFD700; color: #7A5800; }
+  .rank-2 { background: #E0E0E0; color: #555; }
+  .rank-3 { background: #FFAB76; color: #7A3800; }
+  .rank-other { background: var(--primary-light); color: var(--primary); }
+  .leader-avatar { font-size: 26px; }
+  .leader-name { font-weight: 800; font-size: 15px; flex: 1; }
+  .leader-stars { font-family: 'Fredoka One', cursive; font-size: 18px; color: var(--primary); }
+
+  /* REWARDS */
+  .reward-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .reward-card {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+  }
+  .reward-card.can-redeem {
+    border-color: var(--primary);
+    box-shadow: 0 4px 16px rgba(108,99,255,0.15);
+  }
+  .reward-icon { font-size: 36px; margin-bottom: 8px; }
+  .reward-name { font-weight: 800; font-size: 13px; margin-bottom: 4px; }
+  .reward-cost {
+    font-family: 'Fredoka One', cursive;
+    font-size: 14px;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+  .redeem-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .redeem-btn:disabled {
+    background: var(--border);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+  .redeem-btn:not(:disabled):hover { background: #5A52E0; transform: scale(1.02); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(45,45,78,0.6);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+    animation: slideUp 0.3s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 20px;
+    margin: 0 auto 20px;
+  }
+  .modal-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: var(--primary);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  /* ADMIN */
+  .admin-section { margin-bottom: 24px; }
+  .admin-section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+  }
+  .input-group { margin-bottom: 12px; }
+  .input-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 5px; display: block; }
+  .input-field {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--bg);
+  }
+  .input-field:focus { border-color: var(--primary); }
+  .input-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-primary:hover { background: #5A52E0; }
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .emoji-pick { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .emoji-opt {
+    width: 36px; height: 36px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .emoji-opt.selected { border-color: var(--primary); background: var(--primary-light); }
+  .manage-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+  }
+  .manage-item-icon { font-size: 22px; }
+  .manage-item-name { flex: 1; font-weight: 700; font-size: 13px; }
+  .manage-item-stars { font-family: 'Fredoka One', cursive; font-size: 13px; color: var(--primary); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 90px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .badge-reward { background: var(--primary-light); color: var(--primary); }
+  .badge-punish { background: var(--danger-light); color: var(--danger); }
+
+  /* FILTER TABS */
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+  .filter-tab {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .filter-tab.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+  /* PASSWORD SCREEN */
+  .pw-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--primary);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+  }
+  .pw-screen.show { display: flex; }
+  .pw-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: white;
+    text-align: center;
+  }
+  .pw-subtitle { color: rgba(255,255,255,0.8); font-weight: 600; font-size: 15px; text-align: center; }
+  .pw-input {
+    width: 100%;
+    max-width: 280px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 6px;
+    outline: none;
+  }
+  .pw-btn {
+    background: white;
+    color: var(--primary);
+    border: none;
+    border-radius: 16px;
+    padding: 14px 40px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pw-btn:hover { transform: scale(1.05); }
+  .pw-close {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-text { font-weight: 700; font-size: 15px; }
+  .empty-sub { font-size: 13px; margin-top: 6px; }
+
+  /* CONFIRM MODAL */
+  .confirm-content { text-align: center; }
+  .confirm-icon { font-size: 52px; margin-bottom: 12px; }
+  .confirm-title { font-family: 'Fredoka One', cursive; font-size: 20px; margin-bottom: 8px; }
+  .confirm-desc { font-size: 14px; color: var(--text-muted); font-weight: 600; margin-bottom: 20px; }
+  .confirm-btns { display: flex; gap: 10px; }
+  .confirm-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .confirm-btn.yes { background: var(--primary); color: white; }
+  .confirm-btn.yes.danger { background: var(--danger); }
+  .confirm-btn.no { background: var(--border); color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- PASSWORD SCREEN -->
+<div class="pw-screen" id="pwScreen">
+  <div style="font-size:60px;">🔐</div>
+  <div class="pw-title">Mode Admin</div>
+  <div class="pw-subtitle">Masukkan PIN untuk melanjutkan</div>
+  <input class="pw-input" type="password" id="pwInput" maxlength="4" placeholder="••••" inputmode="numeric">
+  <button class="pw-btn" onclick="checkPin()">Masuk</button>
+  <button class="pw-close" onclick="closePwScreen()">Batal</button>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:24px;">⭐</span>
+      <span class="app-title">Bintang Pintar</span>
+    </div>
+    <button class="admin-btn" onclick="openAdmin()">⚙️ Admin</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="child-selector" id="childSelector"></div>
+    <div class="star-card" id="starCard">
+      <div class="child-name" id="scName">Pilih Anak</div>
+      <div class="star-count" id="scCount">0 ⭐</div>
+      <div class="star-label">bintang terkumpul</div>
+      <div class="star-bar-wrap">
+        <div class="star-bar-label">
+          <span id="scProgress">0 / 50 menuju hadiah</span>
+          <span id="scPercent">0%</span>
+        </div>
+        <div class="star-bar"><div class="star-bar-fill" id="scBar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="quick-row">
+      <div class="quick-card" onclick="showPage('page-activities')">
+        <div class="q-icon">🎯</div>
+        <div>
+          <div class="q-label">Aktivitas</div>
+          <div class="q-sub">Kumpulkan bintang</div>
+        </div>
+      </div>
+      <div class="quick-card" onclick="showPage('page-rewards')">
+        <div class="q-icon">🎁</div>
+        <div>
+          <div class="q-label">Hadiah</div>
+          <div class="q-sub">Tukar bintang</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-title">📋 Aktivitas Terbaru</div>
+    <div id="recentHistory"></div>
+  </div>
+
+  <!-- ACTIVITIES PAGE -->
+  <div class="page" id="page-activities">
+    <div class="child-selector" id="childSelector2"></div>
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="filterActivities('all', this)">Semua</div>
+      <div class="filter-tab" onclick="filterActivities('reward', this)">⭐ Reward</div>
+      <div class="filter-tab" onclick="filterActivities('punishment', this)">⚠️ Hukuman</div>
+    </div>
+    <div class="section-title">🎯 Pilih Aktivitas</div>
+    <div id="activityList"></div>
+  </div>
+
+  <!-- HISTORY PAGE -->
+  <div class="page" id="page-history">
+    <div class="child-selector" id="childSelector3"></div>
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="filterHistory('all', this)">Semua</div>
+      <div class="filter-tab" onclick="filterHistory('reward', this)">⭐ Reward</div>
+      <div class="filter-tab" onclick="filterHistory('punishment', this)">⚠️ Hukuman</div>
+      <div class="filter-tab" onclick="filterHistory('redeem', this)">🎁 Penukaran</div>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- LEADERBOARD PAGE -->
+  <div class="page" id="page-leaderboard">
+    <div class="section-title">🏆 Papan Peringkat</div>
+    <div class="leader-card" id="leaderboard"></div>
+    <div id="achSection"></div>
+  </div>
+
+  <!-- REWARDS PAGE -->
+  <div class="page" id="page-rewards">
+    <div class="child-selector" id="childSelector4"></div>
+    <div class="section-title">🎁 Tukar Hadiah</div>
+    <div style="background:var(--primary-light);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:20px;">⭐</span>
+      <span style="font-weight:800;font-size:14px;color:var(--primary)">Bintangmu: <span id="rewardStarCount">0</span></span>
+    </div>
+    <div class="reward-grid" id="rewardGrid"></div>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div class="page" id="page-admin">
+    <div class="section-title">⚙️ Panel Admin</div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Kelola Anak</div>
+      <div class="input-row">
+        <div>
+          <div class="input-label">Nama Anak</div>
+          <input class="input-field" id="newChildName" placeholder="Nama anak...">
+        </div>
+        <div>
+          <div class="input-label">Avatar</div>
+          <input class="input-field" id="newChildEmoji" placeholder="😊" style="width:70px;text-align:center;font-size:20px;">
+        </div>
+        <button class="btn-primary" onclick="addChild()" style="margin-top:22px;">+ Tambah</button>
+      </div>
+      <div id="childManageList"></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Tambah Aktivitas Reward</div>
+      <div class="input-group">
+        <div class="input-label">Nama Aktivitas</div>
+        <input class="input-field" id="actName" placeholder="Contoh: Bersih-bersih kamar">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Icon</div>
+        <div class="emoji-pick" id="actEmojiPick">
+          <div class="emoji-opt selected" onclick="selectEmoji('act','🧹',this)">🧹</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','📚',this)">📚</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🏃',this)">🏃</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🙏',this)">🙏</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🍽️',this)">🍽️</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','💪',this)">💪</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🎨',this)">🎨</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🌟',this)">🌟</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group" style="margin:0">
+          <div class="input-label">Bintang (reward)</div>
+          <input class="input-field" id="actStars" type="number" min="1" max="20" placeholder="1-20" style="width:100px;">
+        </div>
+        <button class="btn-primary" onclick="addActivity('reward')" style="margin-top:22px;">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Tambah Hukuman</div>
+      <div class="input-group">
+        <div class="input-label">Nama Hukuman</div>
+        <input class="input-field" id="punName" placeholder="Contoh: Tidak mengerjakan PR">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Icon</div>
+        <div class="emoji-pick" id="punEmojiPick">
+          <div class="emoji-opt selected" onclick="selectEmoji('pun','⚠️',this)">⚠️</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','😤',this)">😤</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','📵',this)">📵</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','🚫',this)">🚫</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','😔',this)">😔</div>
+          <div class="emoji-opt" onclick="selectEmoji('pun','🙅',this)">🙅</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group" style="margin:0">
+          <div class="input-label">Bintang dikurangi</div>
+          <input class="input-field" id="punStars" type="number" min="1" max="20" placeholder="1-20" style="width:120px;">
+        </div>
+        <button class="btn-primary" onclick="addActivity('punishment')" style="background:var(--danger);margin-top:22px;">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Daftar Aktivitas</div>
+      <div id="actManageList"></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Tambah Hadiah</div>
+      <div class="input-group">
+        <div class="input-label">Nama Hadiah</div>
+        <input class="input-field" id="rwdName" placeholder="Contoh: Nonton film pilihan">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Icon</div>
+        <div class="emoji-pick" id="rwdEmojiPick">
+          <div class="emoji-opt selected" onclick="selectEmoji('rwd','🎬',this)">🎬</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🍦',this)">🍦</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎮',this)">🎮</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🧸',this)">🧸</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🍕',this)">🍕</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🎡',this)">🎡</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','📱',this)">📱</div>
+          <div class="emoji-opt" onclick="selectEmoji('rwd','🏖️',this)">🏖️</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group" style="margin:0">
+          <div class="input-label">Butuh berapa bintang?</div>
+          <input class="input-field" id="rwdCost" type="number" min="1" placeholder="Jumlah bintang" style="width:160px;">
+        </div>
+        <button class="btn-primary" onclick="addReward()" style="margin-top:22px;">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Daftar Hadiah</div>
+      <div id="rwdManageList"></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Ubah PIN Admin</div>
+      <div class="input-row">
+        <input class="input-field" id="newPin" type="password" placeholder="PIN baru (4 angka)" maxlength="4" inputmode="numeric">
+        <button class="btn-primary" onclick="changePin()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('page-home')">
+    <span class="icon">🏠</span>Beranda
+  </button>
+  <button class="nav-btn" onclick="showPage('page-activities')">
+    <span class="icon">🎯</span>Aktivitas
+  </button>
+  <button class="nav-btn" onclick="showPage('page-history')">
+    <span class="icon">📋</span>Riwayat
+  </button>
+  <button class="nav-btn" onclick="showPage('page-leaderboard')">
+    <span class="icon">🏆</span>Ranking
+  </button>
+  <button class="nav-btn" onclick="showPage('page-rewards')">
+    <span class="icon">🎁</span>Hadiah
+  </button>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="confirm-content">
+      <div class="confirm-icon" id="confirmIcon">⭐</div>
+      <div class="confirm-title" id="confirmTitle">Konfirmasi</div>
+      <div class="confirm-desc" id="confirmDesc">Yakin?</div>
+      <div class="confirm-btns">
+        <button class="confirm-btn no" onclick="closeConfirm()">Batal</button>
+        <button class="confirm-btn yes" id="confirmYes" onclick="doConfirm()">Ya, Lanjutkan!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VOUCHER MODAL -->
+<div class="modal-overlay" id="voucherModal">
+  <div class="modal" style="border-radius:24px 24px 0 0;padding:0;overflow:hidden;">
+    <div id="voucherContent"></div>
+    <div style="padding:16px 20px 20px;display:flex;gap:10px;">
+      <button class="confirm-btn no" style="flex:1" onclick="closeVoucher()">Tutup</button>
+      <button class="confirm-btn yes" style="flex:1" onclick="printVoucher()">🖨️ Cetak / Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA STORE ──────────────────────────────────────────────
+const DEFAULT_PIN = '1234';
+
+const defaultData = {
+  pin: DEFAULT_PIN,
+  children: [
+    { id: 1, name: 'Anak 1', emoji: '😊', stars: 0 },
+    { id: 2, name: 'Anak 2', emoji: '🦁', stars: 0 }
+  ],
+  activities: [
+    { id: 1, name: 'Bersih-bersih kamar', emoji: '🧹', stars: 3, type: 'reward' },
+    { id: 2, name: 'Baca buku 30 menit', emoji: '📚', stars: 5, type: 'reward' },
+    { id: 3, name: 'Makan sayuran', emoji: '🍽️', stars: 2, type: 'reward' },
+    { id: 4, name: 'Olahraga pagi', emoji: '🏃', stars: 4, type: 'reward' },
+    { id: 5, name: 'Bantu orang tua', emoji: '💪', stars: 3, type: 'reward' },
+    { id: 6, name: 'Tidak mengerjakan PR', emoji: '⚠️', stars: 5, type: 'punishment' },
+    { id: 7, name: 'Berkelahi dengan saudara', emoji: '😤', stars: 3, type: 'punishment' },
+    { id: 8, name: 'Tidak beres-beres mainan', emoji: '🚫', stars: 2, type: 'punishment' }
+  ],
+  rewards: [
+    { id: 1, name: 'Nonton film pilihan', emoji: '🎬', cost: 20 },
+    { id: 2, name: 'Es krim 2 scoop', emoji: '🍦', cost: 15 },
+    { id: 3, name: 'Main game 1 jam extra', emoji: '🎮', cost: 25 },
+    { id: 4, name: 'Pilih menu makan malam', emoji: '🍕', cost: 30 }
+  ],
+  history: [],
+  nextId: 100
+};
+
+let data = JSON.parse(localStorage.getItem('bintangPintar') || 'null') || defaultData;
+let selectedChild = data.children[0]?.id || null;
+let actFilter = 'all';
+let histFilter = 'all';
+let selectedActEmoji = '🧹';
+let selectedPunEmoji = '⚠️';
+let selectedRwdEmoji = '🎬';
+let confirmCallback = null;
+
+function save() {
+  localStorage.setItem('bintangPintar', JSON.stringify(data));
+}
+
+// ── NAVIGATION ──────────────────────────────────────────────
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(pageId)?.classList.add('active');
+  const idx = ['page-home','page-activities','page-history','page-leaderboard','page-rewards'].indexOf(pageId);
+  if (idx >= 0) document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
+  renderAll();
+}
+
+// ── RENDER ───────────────────────────────────────────────────
+function renderAll() {
+  renderChildSelectors();
+  renderStarCard();
+  renderRecentHistory();
+  renderActivities();
+  renderHistory();
+  renderLeaderboard();
+  renderRewards();
+  renderAdminLists();
+}
+
+function renderChildSelectors() {
+  ['childSelector','childSelector2','childSelector3','childSelector4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = data.children.map(c => `
+      <div class="child-chip ${c.id === selectedChild ? 'active' : ''}" onclick="selectChild(${c.id})">
+        <div class="child-avatar">${c.emoji}</div>
+        <span>${c.name.split(' ')[0]}</span>
+      </div>`).join('');
+  });
+}
+
+function selectChild(id) {
+  selectedChild = id;
+  renderAll();
+}
+
+function getChild() {
+  return data.children.find(c => c.id === selectedChild) || data.children[0];
+}
+
+function getNextRewardTarget(stars) {
+  const sorted = [...data.rewards].sort((a, b) => a.cost - b.cost);
+  const next = sorted.find(r => r.cost > stars);
+  if (next) return next;
+  return sorted[sorted.length - 1] || null;
+}
+
+function renderStarCard() {
+  const child = getChild();
+  if (!child) return;
+  const sorted = [...data.rewards].sort((a, b) => a.cost - b.cost);
+  const nextReward = sorted.find(r => r.cost > child.stars);
+  const allReached = !nextReward;
+
+  let pct, progressLabel;
+  if (allReached) {
+    pct = 100;
+    progressLabel = '✅ Semua hadiah sudah terjangkau!';
+  } else {
+    // Find previous milestone (largest cost <= stars)
+    const prev = [...sorted].reverse().find(r => r.cost <= child.stars);
+    const fromStars = prev ? prev.cost : 0;
+    const range = nextReward.cost - fromStars;
+    const progress = child.stars - fromStars;
+    pct = range > 0 ? Math.min(100, Math.round((progress / range) * 100)) : 0;
+    progressLabel = `${child.stars} / ${nextReward.cost} ⭐ menuju "${nextReward.name}"`;
+  }
+
+  document.getElementById('scName').textContent = child.name;
+  document.getElementById('scCount').textContent = child.stars + ' ⭐';
+  document.getElementById('scProgress').textContent = progressLabel;
+  document.getElementById('scPercent').textContent = pct + '%';
+  document.getElementById('scBar').style.width = pct + '%';
+  document.getElementById('rewardStarCount').textContent = child.stars;
+}
+
+function renderRecentHistory() {
+  const child = getChild();
+  if (!child) return;
+  const items = data.history.filter(h => h.childId === child.id).slice(-5).reverse();
+  const el = document.getElementById('recentHistory');
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Belum ada aktivitas</div><div class="empty-sub">Mulai catat aktivitas hari ini!</div></div>`;
+    return;
+  }
+  el.innerHTML = items.map(h => `
+    <div class="history-item">
+      <div class="hist-icon">${h.emoji}</div>
+      <div class="hist-info">
+        <div class="hist-name">${h.name}</div>
+        <div class="hist-meta">${h.date} • ${h.childName}</div>
+      </div>
+      <div class="hist-stars ${h.type === 'punishment' ? 'minus' : 'plus'}">${h.type === 'punishment' ? '-' : '+'}${h.stars}⭐</div>
+    </div>`).join('');
+}
+
+function renderActivities() {
+  const el = document.getElementById('activityList');
+  let acts = data.activities;
+  if (actFilter === 'reward') acts = acts.filter(a => a.type === 'reward');
+  else if (actFilter === 'punishment') acts = acts.filter(a => a.type === 'punishment');
+  if (!acts.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🤷</div><div class="empty-text">Tidak ada aktivitas</div><div class="empty-sub">Tambahkan lewat panel Admin</div></div>`;
+    return;
+  }
+  el.innerHTML = acts.map(a => `
+    <div class="activity-item ${a.type === 'punishment' ? 'punishment' : ''}" onclick="promptActivity(${a.id})">
+      <div class="act-icon">${a.emoji}</div>
+      <div class="act-info">
+        <div class="act-name">${a.name}</div>
+        <div class="act-desc">${a.type === 'punishment' ? 'Hukuman' : 'Reward'}</div>
+      </div>
+      <div class="act-stars ${a.type === 'punishment' ? 'minus' : 'plus'}">
+        ${a.type === 'punishment' ? '-' : '+'}${a.stars} ⭐
+      </div>
+    </div>`).join('');
+}
+
+function filterActivities(f, el) {
+  actFilter = f;
+  document.querySelectorAll('#page-activities .filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderActivities();
+}
+
+function renderHistory() {
+  const child = getChild();
+  const el = document.getElementById('historyList');
+  if (!child) return;
+  let items = data.history.filter(h => h.childId === child.id).reverse();
+  if (histFilter === 'reward') items = items.filter(h => h.type === 'reward');
+  else if (histFilter === 'punishment') items = items.filter(h => h.type === 'punishment');
+  else if (histFilter === 'redeem') items = items.filter(h => h.type === 'redeem');
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Belum ada riwayat</div></div>`;
+    return;
+  }
+  el.innerHTML = items.map(h => {
+    let cls = h.type === 'punishment' ? 'minus' : (h.type === 'redeem' ? 'minus' : 'plus');
+    let sign = h.type === 'punishment' || h.type === 'redeem' ? '-' : '+';
+    return `<div class="history-item">
+      <div class="hist-icon">${h.emoji}</div>
+      <div class="hist-info">
+        <div class="hist-name">${h.name}</div>
+        <div class="hist-meta">${h.date} • ${h.childName}</div>
+      </div>
+      <div class="hist-stars ${cls}">${sign}${h.stars}⭐</div>
+    </div>`;
+  }).join('');
+}
+
+function filterHistory(f, el) {
+  histFilter = f;
+  document.querySelectorAll('#page-history .filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderHistory();
+}
+
+function renderLeaderboard() {
+  const sorted = [...data.children].sort((a, b) => b.stars - a.stars);
+  const el = document.getElementById('leaderboard');
+  if (!sorted.length) { el.innerHTML = '<div class="empty-state"><div class="empty-text">Belum ada anak</div></div>'; return; }
+  el.innerHTML = sorted.map((c, i) => {
+    const rank = i + 1;
+    const cls = rank === 1 ? 'top-1' : '';
+    const badgeCls = rank <= 3 ? `rank-${rank}` : 'rank-other';
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    return `<div class="leader-row ${cls}">
+      <div class="rank-badge ${badgeCls}">${medal}</div>
+      <div class="leader-avatar">${c.emoji}</div>
+      <div class="leader-name">${c.name}</div>
+      <div class="leader-stars">${c.stars} ⭐</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRewards() {
+  const child = getChild();
+  const el = document.getElementById('rewardGrid');
+  if (!data.rewards.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🎁</div><div class="empty-text">Belum ada hadiah</div><div class="empty-sub">Tambah lewat panel Admin</div></div>`;
+    return;
+  }
+  el.innerHTML = data.rewards.map(r => {
+    const canRedeem = child && child.stars >= r.cost;
+    return `<div class="reward-card ${canRedeem ? 'can-redeem' : ''}">
+      <div class="reward-icon">${r.emoji}</div>
+      <div class="reward-name">${r.name}</div>
+      <div class="reward-cost">${r.cost} ⭐</div>
+      <button class="redeem-btn" ${canRedeem ? '' : 'disabled'} onclick="promptRedeem(${r.id})">
+        ${canRedeem ? 'Tukar!' : 'Kurang ⭐'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function renderAdminLists() {
+  // Children
+  const cl = document.getElementById('childManageList');
+  if (cl) cl.innerHTML = data.children.map(c => `
+    <div class="manage-item">
+      <div class="manage-item-icon">${c.emoji}</div>
+      <div class="manage-item-name">${c.name}</div>
+      <div class="manage-item-stars">${c.stars} ⭐</div>
+      <button class="btn-danger" onclick="removeChild(${c.id})">Hapus</button>
+    </div>`).join('');
+  // Activities
+  const al = document.getElementById('actManageList');
+  if (al) al.innerHTML = data.activities.map(a => `
+    <div class="manage-item">
+      <div class="manage-item-icon">${a.emoji}</div>
+      <div class="manage-item-name">${a.name} <span class="badge ${a.type === 'reward' ? 'badge-reward' : 'badge-punish'}">${a.type === 'reward' ? 'Reward' : 'Hukuman'}</span></div>
+      <div class="manage-item-stars" style="${a.type === 'punishment' ? 'color:var(--danger)' : ''}">${a.type === 'punishment' ? '-' : '+'}${a.stars} ⭐</div>
+      <button class="btn-danger" onclick="removeActivity(${a.id})">Hapus</button>
+    </div>`).join('');
+  // Rewards
+  const rl = document.getElementById('rwdManageList');
+  if (rl) rl.innerHTML = data.rewards.map(r => `
+    <div class="manage-item">
+      <div class="manage-item-icon">${r.emoji}</div>
+      <div class="manage-item-name">${r.name}</div>
+      <div class="manage-item-stars">${r.cost} ⭐</div>
+      <button class="btn-danger" onclick="removeReward(${r.id})">Hapus</button>
+    </div>`).join('');
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────
+function promptActivity(id) {
+  const child = getChild();
+  const act = data.activities.find(a => a.id === id);
+  if (!child || !act) return;
+  const isPun = act.type === 'punishment';
+  document.getElementById('confirmIcon').textContent = act.emoji;
+  document.getElementById('confirmTitle').textContent = act.name;
+  document.getElementById('confirmDesc').textContent =
+    `${isPun ? 'Hukuman' : 'Reward'} untuk ${child.name}: ${isPun ? '-' : '+'}${act.stars} ⭐`;
+  const btn = document.getElementById('confirmYes');
+  btn.className = `confirm-btn yes${isPun ? ' danger' : ''}`;
+  btn.textContent = isPun ? 'Catat Hukuman' : 'Catat Reward!';
+  confirmCallback = () => doActivity(id);
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+function doActivity(id) {
+  const child = getChild();
+  const act = data.activities.find(a => a.id === id);
+  if (!child || !act) return;
+  const isPun = act.type === 'punishment';
+  if (isPun) {
+    child.stars = Math.max(0, child.stars - act.stars);
+  } else {
+    child.stars += act.stars;
+  }
+  data.history.push({
+    id: data.nextId++,
+    childId: child.id,
+    childName: child.name,
+    name: act.name,
+    emoji: act.emoji,
+    stars: act.stars,
+    type: act.type,
+    date: new Date().toLocaleDateString('id-ID')
+  });
+  save();
+  showToast(isPun ? `⚠️ -${act.stars}⭐ untuk ${child.name}` : `⭐ +${act.stars} bintang untuk ${child.name}!`);
+  renderAll();
+}
+
+function promptRedeem(id) {
+  const child = getChild();
+  const rwd = data.rewards.find(r => r.id === id);
+  if (!child || !rwd || child.stars < rwd.cost) return;
+  document.getElementById('confirmIcon').textContent = rwd.emoji;
+  document.getElementById('confirmTitle').textContent = rwd.name;
+  document.getElementById('confirmDesc').textContent =
+    `Tukar ${rwd.cost} ⭐ dari ${child.name}? Sisa: ${child.stars - rwd.cost} ⭐`;
+  const btn = document.getElementById('confirmYes');
+  btn.className = 'confirm-btn yes';
+  btn.textContent = 'Tukar Sekarang!';
+  confirmCallback = () => doRedeem(id);
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+function doRedeem(id) {
+  const child = getChild();
+  const rwd = data.rewards.find(r => r.id === id);
+  if (!child || !rwd) return;
+  child.stars -= rwd.cost;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+  const voucherId = 'BP-' + String(data.nextId).padStart(5,'0');
+  data.history.push({
+    id: data.nextId++,
+    childId: child.id,
+    childName: child.name,
+    name: `🎁 Tukar: ${rwd.name}`,
+    emoji: rwd.emoji,
+    stars: rwd.cost,
+    type: 'redeem',
+    date: now.toLocaleDateString('id-ID'),
+    voucherId
+  });
+  save();
+  renderAll();
+  showVoucher({ child, rwd, dateStr, timeStr, voucherId, remaining: child.stars });
+}
+
+function showVoucher({ child, rwd, dateStr, timeStr, voucherId, remaining }) {
+  const stars = Array.from({length: Math.min(rwd.cost, 10)}, () => '⭐').join('');
+  document.getElementById('voucherContent').innerHTML = `
+    <div style="background:linear-gradient(135deg,#6C63FF 0%,#9B8FFF 100%);padding:28px 24px 20px;text-align:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:100px;opacity:0.08;">⭐</div>
+      <div style="position:absolute;bottom:-20px;left:-20px;font-size:80px;opacity:0.08;">🎁</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:26px;color:white;letter-spacing:1px;margin-bottom:4px;">VOUCHER HADIAH</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.75);font-weight:700;letter-spacing:2px;">${voucherId}</div>
+    </div>
+    <div style="background:#FFF8DC;padding:16px 24px;border-bottom:2px dashed #E8E6FF;">
+      <div style="text-align:center;margin-bottom:12px;">
+        <div style="font-size:52px;line-height:1.1;">${rwd.emoji}</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:#2D2D4E;margin-top:6px;">${rwd.name}</div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:4px;font-size:18px;margin-bottom:8px;">${stars}${rwd.cost > 10 ? ` +${rwd.cost-10}` : ''}</div>
+      <div style="text-align:center;font-weight:800;font-size:15px;color:#6C63FF;">${rwd.cost} Bintang</div>
+    </div>
+    <div style="padding:16px 24px;background:white;">
+      <table style="width:100%;font-family:'Nunito',sans-serif;font-size:13px;border-collapse:collapse;">
+        <tr>
+          <td style="color:#8A86B8;font-weight:700;padding:5px 0;">Untuk</td>
+          <td style="text-align:right;font-weight:800;color:#2D2D4E;padding:5px 0;">${child.emoji} ${child.name}</td>
+        </tr>
+        <tr>
+          <td style="color:#8A86B8;font-weight:700;padding:5px 0;">Tanggal</td>
+          <td style="text-align:right;font-weight:700;color:#2D2D4E;padding:5px 0;">${dateStr}</td>
+        </tr>
+        <tr>
+          <td style="color:#8A86B8;font-weight:700;padding:5px 0;">Pukul</td>
+          <td style="text-align:right;font-weight:700;color:#2D2D4E;padding:5px 0;">${timeStr}</td>
+        </tr>
+        <tr style="border-top:1px solid #E8E6FF;">
+          <td style="color:#8A86B8;font-weight:700;padding:8px 0 5px;">Bintang digunakan</td>
+          <td style="text-align:right;font-weight:800;color:#FF4757;padding:8px 0 5px;">-${rwd.cost} ⭐</td>
+        </tr>
+        <tr>
+          <td style="color:#8A86B8;font-weight:700;padding:5px 0;">Sisa bintang</td>
+          <td style="text-align:right;font-weight:800;color:#6C63FF;padding:5px 0;">${remaining} ⭐</td>
+        </tr>
+      </table>
+    </div>
+    <div style="background:#F8F7FF;padding:10px 24px;text-align:center;border-top:2px dashed #E8E6FF;">
+      <div style="font-size:11px;color:#8A86B8;font-weight:700;">✨ Bintang Pintar • Voucher Resmi ✨</div>
+      <div style="font-size:11px;color:#8A86B8;font-weight:600;margin-top:2px;">Hadiah ini harus diklaim kepada orang tua</div>
+    </div>`;
+  document.getElementById('voucherModal').classList.add('show');
+}
+
+function closeVoucher() {
+  document.getElementById('voucherModal').classList.remove('show');
+  showToast('🎉 Selamat menikmati hadiahnya!');
+}
+
+function printVoucher() {
+  const content = document.getElementById('voucherContent').innerHTML;
+  const html = `<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Voucher Bintang Pintar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family:'Nunito',sans-serif; background:#f0f0f0; display:flex; justify-content:center; padding:20px; }
+      .wrap { background:white; border-radius:20px; overflow:hidden; max-width:380px; width:100%; box-shadow:0 8px 40px rgba(0,0,0,0.15); }
+    </style>
+  </head><body><div class="wrap">${content}</div></body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'voucher-bintang-pintar.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📥 Voucher berhasil diunduh!');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('show');
+  confirmCallback = null;
+}
+function doConfirm() {
+  if (confirmCallback) confirmCallback();
+  closeConfirm();
+}
+
+// ── ADMIN ────────────────────────────────────────────────────
+function addChild() {
+  const name = document.getElementById('newChildName').value.trim();
+  const emoji = document.getElementById('newChildEmoji').value.trim() || '😊';
+  if (!name) return showToast('⚠️ Masukkan nama anak!');
+  data.children.push({ id: data.nextId++, name, emoji, stars: 0 });
+  document.getElementById('newChildName').value = '';
+  document.getElementById('newChildEmoji').value = '';
+  save(); renderAll();
+  showToast(`✅ ${name} ditambahkan!`);
+}
+
+function removeChild(id) {
+  data.children = data.children.filter(c => c.id !== id);
+  if (selectedChild === id) selectedChild = data.children[0]?.id || null;
+  save(); renderAll();
+  showToast('✅ Anak dihapus');
+}
+
+function addActivity(type) {
+  const nameEl = type === 'reward' ? 'actName' : 'punName';
+  const starsEl = type === 'reward' ? 'actStars' : 'punStars';
+  const name = document.getElementById(nameEl).value.trim();
+  const stars = parseInt(document.getElementById(starsEl).value);
+  const emoji = type === 'reward' ? selectedActEmoji : selectedPunEmoji;
+  if (!name || !stars || stars < 1) return showToast('⚠️ Isi nama dan jumlah bintang!');
+  data.activities.push({ id: data.nextId++, name, emoji, stars, type });
+  document.getElementById(nameEl).value = '';
+  document.getElementById(starsEl).value = '';
+  save(); renderAll();
+  showToast(`✅ Aktivitas "${name}" ditambahkan!`);
+}
+
+function removeActivity(id) {
+  data.activities = data.activities.filter(a => a.id !== id);
+  save(); renderAll();
+}
+
+function addReward() {
+  const name = document.getElementById('rwdName').value.trim();
+  const cost = parseInt(document.getElementById('rwdCost').value);
+  if (!name || !cost || cost < 1) return showToast('⚠️ Isi nama dan biaya bintang!');
+  data.rewards.push({ id: data.nextId++, name, emoji: selectedRwdEmoji, cost });
+  document.getElementById('rwdName').value = '';
+  document.getElementById('rwdCost').value = '';
+  save(); renderAll();
+  showToast(`✅ Hadiah "${name}" ditambahkan!`);
+}
+
+function removeReward(id) {
+  data.rewards = data.rewards.filter(r => r.id !== id);
+  save(); renderAll();
+}
+
+function selectEmoji(prefix, emoji, el) {
+  const pickId = prefix === 'act' ? 'actEmojiPick' : prefix === 'pun' ? 'punEmojiPick' : 'rwdEmojiPick';
+  document.querySelectorAll(`#${pickId} .emoji-opt`).forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  if (prefix === 'act') selectedActEmoji = emoji;
+  else if (prefix === 'pun') selectedPunEmoji = emoji;
+  else selectedRwdEmoji = emoji;
+}
+
+function changePin() {
+  const pin = document.getElementById('newPin').value;
+  if (!/^\d{4}$/.test(pin)) return showToast('⚠️ PIN harus 4 angka!');
+  data.pin = pin;
+  document.getElementById('newPin').value = '';
+  save();
+  showToast('✅ PIN berhasil diubah!');
+}
+
+// ── ADMIN AUTH ────────────────────────────────────────────────
+function openAdmin() {
+  document.getElementById('pwScreen').classList.add('show');
+  document.getElementById('pwInput').value = '';
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+}
+
+function closePwScreen() {
+  document.getElementById('pwScreen').classList.remove('show');
+}
+
+function checkPin() {
+  const pin = document.getElementById('pwInput').value;
+  if (pin === data.pin) {
+    closePwScreen();
+    showPage('page-admin');
+  } else {
+    document.getElementById('pwInput').value = '';
+    showToast('❌ PIN salah! Coba lagi.');
+    document.getElementById('pwInput').focus();
+  }
+}
+
+document.getElementById('pwInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPin();
+});
+
+// ── TOAST ─────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+renderAll();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
+</body>
+</html>
