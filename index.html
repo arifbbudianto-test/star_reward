@@ -957,6 +957,33 @@
         <button class="btn-primary" onclick="changePin()">Simpan</button>
       </div>
     </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">💾 Backup &amp; Restore Data</div>
+
+      <div style="background:var(--success-light);border-radius:12px;padding:12px 14px;margin-bottom:14px;border:1.5px solid #b6f5d4;">
+        <div style="font-weight:800;font-size:13px;color:#1a7a45;margin-bottom:4px;">🔄 Auto-Backup Aktif</div>
+        <div style="font-size:12px;color:#2a9a55;font-weight:600;">Data otomatis disimpan ke folder Downloads setiap ada perubahan. File: <code style="background:rgba(0,0,0,0.07);padding:1px 5px;border-radius:4px;">bintang-pintar-backup.json</code></div>
+        <div style="font-size:11px;color:#3aaa65;margin-top:6px;font-weight:600;" id="lastBackupTime">Belum ada backup sesi ini</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <button onclick="exportData()" style="background:var(--primary);color:white;border:none;border-radius:12px;padding:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="font-size:22px;">📤</span>Export Sekarang
+        </button>
+        <button onclick="document.getElementById('importInput').click()" style="background:var(--primary-light);color:var(--primary);border:2px solid var(--border);border-radius:12px;padding:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="font-size:22px;">📥</span>Import Data
+        </button>
+      </div>
+      <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(event)">
+
+      <div style="background:var(--danger-light);border-radius:12px;padding:10px 14px;border:1.5px solid #ffd0d3;">
+        <div style="font-weight:800;font-size:12px;color:var(--danger);margin-bottom:6px;">⚠️ Zona Berbahaya</div>
+        <button onclick="confirmClearData()" style="background:var(--danger);color:white;border:none;border-radius:10px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;width:100%;">
+          🗑️ Hapus Semua Data
+        </button>
+      </div>
+    </div>
   </div>
 
 </div><!-- end main -->
@@ -1050,8 +1077,136 @@ let selectedRwdEmoji = '🎬';
 let confirmCallback = null;
 let newChildPhoto = null; // base64 for new child being added
 
+let autoBackupTimer = null;
+
 function save() {
   localStorage.setItem('bintangPintar', JSON.stringify(data));
+  // Debounce auto-backup: tunggu 2 detik setelah perubahan terakhir
+  clearTimeout(autoBackupTimer);
+  autoBackupTimer = setTimeout(() => autoBackup(), 2000);
+}
+
+// ── BACKUP & RESTORE ──────────────────────────────────────────
+function buildBackupPayload() {
+  return {
+    _app: 'Bintang Pintar',
+    _version: 1,
+    _exported: new Date().toISOString(),
+    _exportedReadable: new Date().toLocaleString('id-ID'),
+    ...data
+  };
+}
+
+function autoBackup() {
+  try {
+    const payload = JSON.stringify(buildBackupPayload(), null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bintang-pintar-backup.json';
+    // Silent download — hanya bekerja di browser yang mendukung auto-download
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const el = document.getElementById('lastBackupTime');
+    if (el) el.textContent = '✅ Terakhir backup: ' + now;
+    // Simpan timestamp ke localStorage
+    localStorage.setItem('bintangPintarLastBackup', now);
+  } catch(e) {
+    // Silent fail — auto-backup tidak boleh ganggu UX
+    console.warn('Auto-backup gagal:', e);
+  }
+}
+
+function exportData() {
+  try {
+    const payload = JSON.stringify(buildBackupPayload(), null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const stamp = now.getFullYear() + '-' +
+      String(now.getMonth()+1).padStart(2,'0') + '-' +
+      String(now.getDate()).padStart(2,'0');
+    a.download = 'bintang-pintar-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('📤 Data berhasil diekspor!');
+  } catch(e) {
+    showToast('❌ Export gagal: ' + e.message);
+  }
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.json')) {
+    showToast('⚠️ Pilih file .json yang valid!');
+    event.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      // Validasi: harus punya field utama
+      if (!parsed.children || !parsed.activities || !parsed.rewards) {
+        showToast('❌ File tidak valid atau bukan backup Bintang Pintar!');
+        return;
+      }
+      // Konfirmasi sebelum overwrite
+      document.getElementById('confirmIcon').textContent = '📥';
+      document.getElementById('confirmTitle').textContent = 'Import Data';
+      const childNames = (parsed.children || []).map(c => c.name).join(', ');
+      document.getElementById('confirmDesc').textContent =
+        `Data saat ini akan digantikan dengan backup dari ${parsed._exportedReadable || 'file ini'}.\n\nAnak: ${childNames}`;
+      const btn = document.getElementById('confirmYes');
+      btn.className = 'confirm-btn yes';
+      btn.textContent = 'Ya, Import!';
+      confirmCallback = () => doImport(parsed);
+      document.getElementById('confirmModal').classList.add('show');
+    } catch(err) {
+      showToast('❌ File rusak atau bukan JSON yang valid!');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function doImport(parsed) {
+  // Hapus field meta export, sisakan data murni
+  const { _app, _version, _exported, _exportedReadable, ...importedData } = parsed;
+  data = importedData;
+  selectedChild = data.children[0]?.id || null;
+  save();
+  renderAll();
+  showToast('✅ Data berhasil diimpor!');
+}
+
+function confirmClearData() {
+  document.getElementById('confirmIcon').textContent = '🗑️';
+  document.getElementById('confirmTitle').textContent = 'Hapus Semua Data?';
+  document.getElementById('confirmDesc').textContent =
+    'Semua data anak, riwayat, aktivitas, dan hadiah akan dihapus permanen. Pastikan sudah export dulu!';
+  const btn = document.getElementById('confirmYes');
+  btn.className = 'confirm-btn yes danger';
+  btn.textContent = 'Hapus Semua';
+  confirmCallback = () => {
+    localStorage.removeItem('bintangPintar');
+    localStorage.removeItem('bintangPintarLastBackup');
+    data = JSON.parse(JSON.stringify(defaultData));
+    selectedChild = data.children[0]?.id || null;
+    save();
+    renderAll();
+    showToast('🗑️ Semua data telah dihapus');
+  };
+  document.getElementById('confirmModal').classList.add('show');
 }
 
 // ── NAVIGATION ──────────────────────────────────────────────
@@ -1689,6 +1844,16 @@ function showToast(msg) {
 
 // ── INIT ──────────────────────────────────────────────────────
 renderAll();
+
+// Tampilkan waktu backup terakhir (dari sesi sebelumnya)
+const lastBk = localStorage.getItem('bintangPintarLastBackup');
+if (lastBk) {
+  const el = document.getElementById('lastBackupTime');
+  if (el) el.textContent = '✅ Backup terakhir (sesi lalu): ' + lastBk;
+}
+
+// Trigger auto-backup 5 detik setelah app dibuka (silent)
+setTimeout(() => autoBackup(), 5000);
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
