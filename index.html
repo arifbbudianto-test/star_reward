@@ -4,9 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#6C63FF">
-<meta name="description" content="Aplikasi Reward Bintang untuk Anak">
+<meta name="description" content="Aplikasi reward bintang untuk memotivasi anak-anak. Kumpulkan bintang dari aktivitas positif dan tukar dengan hadiah nyata.">
+<meta name="application-name" content="Bintang Pintar">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bintang Pintar">
+<meta name="msapplication-TileColor" content="#6C63FF">
+<meta name="msapplication-TileImage" content="icons/icon-144.png">
+<meta name="msapplication-config" content="none">
 <title>Bintang Pintar</title>
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+<!-- Canonical URL untuk PWABuilder -->
+<link rel="canonical" href="https://arifbbudianto-test.github.io/star_reward/index.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -743,8 +757,8 @@
     <div class="child-selector" id="childSelector2"></div>
     <div class="filter-tabs">
       <div class="filter-tab active" onclick="filterActivities('all', this)">Semua</div>
-      <div class="filter-tab" onclick="filterActivities('reward', this)">⭐ Reward</div>
-      <div class="filter-tab" onclick="filterActivities('punishment', this)">⚠️ Hukuman</div>
+      <div class="filter-tab" onclick="filterActivities('reward', this)">👍 Baik</div>
+      <div class="filter-tab" onclick="filterActivities('punishment', this)">👎 Buruk</div>
     </div>
     <div class="section-title">🎯 Pilih Aktivitas</div>
     <div id="activityList"></div>
@@ -755,8 +769,8 @@
     <div class="child-selector" id="childSelector3"></div>
     <div class="filter-tabs">
       <div class="filter-tab active" onclick="filterHistory('all', this)">Semua</div>
-      <div class="filter-tab" onclick="filterHistory('reward', this)">⭐ Reward</div>
-      <div class="filter-tab" onclick="filterHistory('punishment', this)">⚠️ Hukuman</div>
+      <div class="filter-tab" onclick="filterHistory('reward', this)">👍 Baik</div>
+      <div class="filter-tab" onclick="filterHistory('punishment', this)">👎 Buruk</div>
       <div class="filter-tab" onclick="filterHistory('redeem', this)">🎁 Penukaran</div>
     </div>
     <div id="historyList"></div>
@@ -825,13 +839,27 @@
     </div>
 
     <div class="admin-section">
-      <div class="admin-section-title">Tambah Aktivitas Reward</div>
+    <div class="admin-section">
+      <div class="admin-section-title">Tambah Aktivitas</div>
+
+      <!-- Toggle good/bad -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <button id="actToggleGood" onclick="switchActType('reward')"
+          style="padding:14px 10px;border-radius:14px;border:2.5px solid var(--primary);background:var(--primary);color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .2s;">
+          <span style="font-size:28px;">👍</span>Aktivitas Baik
+        </button>
+        <button id="actToggleBad" onclick="switchActType('punishment')"
+          style="padding:14px 10px;border-radius:14px;border:2.5px solid var(--border);background:white;color:var(--text-muted);font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .2s;">
+          <span style="font-size:28px;">👎</span>Aktivitas Buruk
+        </button>
+      </div>
+
       <div class="input-group">
         <div class="input-label">Nama Aktivitas</div>
         <input class="input-field" id="actName" placeholder="Contoh: Bersih-bersih kamar">
       </div>
       <div class="input-group">
-        <div class="input-label">Icon</div>
+        <div class="input-label">Pilih Emoticon</div>
         <div class="emoji-pick" id="actEmojiPick">
           <div class="emoji-opt selected" onclick="selectEmoji('act','🧹',this)">🧹</div>
           <div class="emoji-opt" onclick="selectEmoji('act','📚',this)">📚</div>
@@ -853,46 +881,24 @@
           <div class="emoji-opt" onclick="selectEmoji('act','💤',this)">💤</div>
           <div class="emoji-opt" onclick="selectEmoji('act','🗑️',this)">🗑️</div>
           <div class="emoji-opt" onclick="selectEmoji('act','🤝',this)">🤝</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','⚠️',this)">⚠️</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','😤',this)">😤</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','📵',this)">📵</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🚫',this)">🚫</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','😔',this)">😔</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🙅',this)">🙅</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','😠',this)">😠</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🤦',this)">🤦</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','💢',this)">💢</div>
+          <div class="emoji-opt" onclick="selectEmoji('act','🤐',this)">🤐</div>
         </div>
       </div>
       <div class="input-row">
         <div class="input-group" style="margin:0">
-          <div class="input-label">Bintang (reward)</div>
-          <input class="input-field" id="actStars" type="number" min="1" max="20" placeholder="1-20" style="width:100px;">
+          <div class="input-label" id="actStarsLabel">Bintang didapat</div>
+          <input class="input-field" id="actStars" type="number" min="1" max="20" placeholder="1-20" style="width:110px;">
         </div>
-        <button class="btn-primary" onclick="addActivity('reward')" style="margin-top:22px;">+ Tambah</button>
-      </div>
-    </div>
-
-    <div class="admin-section">
-      <div class="admin-section-title">Tambah Hukuman</div>
-      <div class="input-group">
-        <div class="input-label">Nama Hukuman</div>
-        <input class="input-field" id="punName" placeholder="Contoh: Tidak mengerjakan PR">
-      </div>
-      <div class="input-group">
-        <div class="input-label">Icon</div>
-        <div class="emoji-pick" id="punEmojiPick">
-          <div class="emoji-opt selected" onclick="selectEmoji('pun','⚠️',this)">⚠️</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','😤',this)">😤</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','📵',this)">📵</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','🚫',this)">🚫</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','😔',this)">😔</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','🙅',this)">🙅</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','😠',this)">😠</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','🤦',this)">🤦</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','😭',this)">😭</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','🗣️',this)">🗣️</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','💢',this)">💢</div>
-          <div class="emoji-opt" onclick="selectEmoji('pun','🤐',this)">🤐</div>
-        </div>
-      </div>
-      <div class="input-row">
-        <div class="input-group" style="margin:0">
-          <div class="input-label">Bintang dikurangi</div>
-          <input class="input-field" id="punStars" type="number" min="1" max="20" placeholder="1-20" style="width:120px;">
-        </div>
-        <button class="btn-primary" onclick="addActivity('punishment')" style="background:var(--danger);margin-top:22px;">+ Tambah</button>
+        <button id="actSubmitBtn" class="btn-primary" onclick="addActivityUnified()" style="margin-top:22px;">+ Tambah</button>
       </div>
     </div>
 
@@ -1007,6 +1013,40 @@
   </button>
 </div>
 
+<!-- CROP MODAL -->
+<div class="modal-overlay" id="cropModal">
+  <div class="modal" style="border-radius:24px 24px 0 0;padding:20px;">
+    <div class="modal-handle"></div>
+    <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--primary);text-align:center;margin-bottom:14px;">✂️ Crop Foto</div>
+    <div style="position:relative;width:100%;padding-bottom:100%;background:#111;border-radius:16px;overflow:hidden;margin-bottom:14px;">
+      <img id="cropImg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;transform-origin:center;user-select:none;-webkit-user-select:none;">
+      <!-- circular overlay -->
+      <div style="position:absolute;inset:0;pointer-events:none;">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" style="position:absolute;top:0;left:0;">
+          <defs>
+            <mask id="circleMask">
+              <rect width="300" height="300" fill="white"/>
+              <circle cx="150" cy="150" r="120" fill="black"/>
+            </mask>
+          </defs>
+          <rect width="300" height="300" fill="rgba(0,0,0,0.55)" mask="url(#circleMask)"/>
+          <circle cx="150" cy="150" r="120" fill="none" stroke="white" stroke-width="2" stroke-dasharray="6,4"/>
+        </svg>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <span style="font-size:12px;color:var(--text-muted);font-weight:700;">🔍</span>
+      <input type="range" id="cropZoom" min="100" max="300" value="100" style="flex:1;" oninput="updateCrop()">
+      <span style="font-size:12px;color:var(--text-muted);font-weight:700;">300%</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:14px;font-weight:600;">Geser foto untuk memposisikan • Scroll/pinch untuk zoom</div>
+    <div style="display:flex;gap:10px;">
+      <button class="confirm-btn no" style="flex:1" onclick="closeCrop()">Batal</button>
+      <button class="confirm-btn yes" style="flex:1" onclick="applyCrop()">✅ Gunakan Foto</button>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM MODAL -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
@@ -1081,9 +1121,21 @@ let autoBackupTimer = null;
 
 function save() {
   localStorage.setItem('bintangPintar', JSON.stringify(data));
-  // Debounce auto-backup: tunggu 2 detik setelah perubahan terakhir
-  clearTimeout(autoBackupTimer);
-  autoBackupTimer = setTimeout(() => autoBackup(), 2000);
+  // Jangan trigger download setiap save — cukup cek jadwal 24 jam
+  scheduleAutoBackupIfDue();
+}
+
+// ── BACKUP & RESTORE ──────────────────────────────────────────
+const BACKUP_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 jam
+
+function scheduleAutoBackupIfDue() {
+  const lastTs = parseInt(localStorage.getItem('bintangPintarLastBackupTs') || '0');
+  const now = Date.now();
+  if (now - lastTs >= BACKUP_INTERVAL_MS) {
+    // Sudah > 24 jam sejak backup terakhir — jalankan sekarang
+    clearTimeout(autoBackupTimer);
+    autoBackupTimer = setTimeout(() => autoBackup(), 3000);
+  }
 }
 
 // ── BACKUP & RESTORE ──────────────────────────────────────────
@@ -1104,19 +1156,19 @@ function autoBackup() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
+    // Nama file tetap sama setiap kali → otomatis replace file lama di Downloads
     a.download = 'bintang-pintar-backup.json';
-    // Silent download — hanya bekerja di browser yang mendukung auto-download
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const now = Date.now();
+    const readableTime = new Date(now).toLocaleString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    localStorage.setItem('bintangPintarLastBackupTs', String(now));
+    localStorage.setItem('bintangPintarLastBackupLabel', readableTime);
     const el = document.getElementById('lastBackupTime');
-    if (el) el.textContent = '✅ Terakhir backup: ' + now;
-    // Simpan timestamp ke localStorage
-    localStorage.setItem('bintangPintarLastBackup', now);
+    if (el) el.textContent = '✅ Backup terakhir: ' + readableTime;
   } catch(e) {
-    // Silent fail — auto-backup tidak boleh ganggu UX
     console.warn('Auto-backup gagal:', e);
   }
 }
@@ -1199,7 +1251,8 @@ function confirmClearData() {
   btn.textContent = 'Hapus Semua';
   confirmCallback = () => {
     localStorage.removeItem('bintangPintar');
-    localStorage.removeItem('bintangPintarLastBackup');
+    localStorage.removeItem('bintangPintarLastBackupTs');
+    localStorage.removeItem('bintangPintarLastBackupLabel');
     data = JSON.parse(JSON.stringify(defaultData));
     selectedChild = data.children[0]?.id || null;
     save();
@@ -1326,24 +1379,49 @@ function renderRecentHistory() {
 
 function renderActivities() {
   const el = document.getElementById('activityList');
-  let acts = data.activities;
+  let acts = [...data.activities];
+
+  // Sort: aktivitas baik (reward) di atas, buruk (punishment) di bawah
+  acts.sort((a, b) => {
+    if (a.type === b.type) return 0;
+    return a.type === 'reward' ? -1 : 1;
+  });
+
   if (actFilter === 'reward') acts = acts.filter(a => a.type === 'reward');
   else if (actFilter === 'punishment') acts = acts.filter(a => a.type === 'punishment');
+
   if (!acts.length) {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon">🤷</div><div class="empty-text">Tidak ada aktivitas</div><div class="empty-sub">Tambahkan lewat panel Admin</div></div>`;
     return;
   }
-  el.innerHTML = acts.map(a => `
-    <div class="activity-item ${a.type === 'punishment' ? 'punishment' : ''}" onclick="promptActivity(${a.id})">
+
+  // Group dengan separator jika menampilkan semua
+  let html = '';
+  let shownGood = false, shownBad = false;
+  acts.forEach(a => {
+    const isGood = a.type === 'reward';
+    if (actFilter === 'all') {
+      if (isGood && !shownGood) {
+        html += `<div style="display:flex;align-items:center;gap:8px;margin:0 0 10px;"><span style="font-size:16px;">👍</span><span style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--primary);">Aktivitas Baik</span><div style="flex:1;height:1.5px;background:var(--border);"></div></div>`;
+        shownGood = true;
+      }
+      if (!isGood && !shownBad) {
+        html += `<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px;"><span style="font-size:16px;">👎</span><span style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--danger);">Aktivitas Buruk</span><div style="flex:1;height:1.5px;background:var(--danger-light);"></div></div>`;
+        shownBad = true;
+      }
+    }
+    html += `<div class="activity-item ${isGood ? '' : 'punishment'}" onclick="promptActivity(${a.id})">
       <div class="act-icon">${a.emoji}</div>
       <div class="act-info">
         <div class="act-name">${a.name}</div>
-        <div class="act-desc">${a.type === 'punishment' ? 'Hukuman' : 'Reward'}</div>
+        <div class="act-desc">${isGood ? '👍 Aktivitas Baik' : '👎 Aktivitas Buruk'}</div>
       </div>
-      <div class="act-stars ${a.type === 'punishment' ? 'minus' : 'plus'}">
-        ${a.type === 'punishment' ? '-' : '+'}${a.stars} ⭐
+      <div class="act-stars ${isGood ? 'plus' : 'minus'}">
+        ${isGood ? '+' : '-'}${a.stars} ⭐
       </div>
-    </div>`).join('');
+    </div>`;
+  });
+  el.innerHTML = html;
 }
 
 function filterActivities(f, el) {
@@ -1442,16 +1520,15 @@ function renderAdminLists() {
       ? `<img src="${c.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
       : `<div class="manage-item-icon">${c.emoji || '😊'}</div>`;
     return `<div class="manage-item">
-      <div style="position:relative;cursor:pointer;" onclick="editChildPhoto(${c.id})" title="Ganti foto">
+      <div style="position:relative;cursor:pointer;" data-action="editChildPhoto" data-id="${c.id}" title="Ganti foto">
         ${av}
-        <div style="position:absolute;bottom:-2px;right:-2px;background:var(--primary);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;">📷</div>
+        <div style="position:absolute;bottom:-2px;right:-2px;background:var(--primary);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;pointer-events:none;">📷</div>
       </div>
       <div class="manage-item-name">${c.name}</div>
       <div class="manage-item-stars">${c.stars} ⭐</div>
-      <button class="btn-danger" onclick="removeChild(${c.id})">Hapus</button>
+      <button class="btn-danger" data-action="removeChild" data-id="${c.id}">Hapus</button>
     </div>`;
   }).join('');
-  // hidden file input for editing existing child photo
   if (cl && !document.getElementById('editPhotoInput')) {
     const inp = document.createElement('input');
     inp.type = 'file'; inp.id = 'editPhotoInput'; inp.accept = 'image/*'; inp.style.display = 'none';
@@ -1463,9 +1540,9 @@ function renderAdminLists() {
   if (al) al.innerHTML = data.activities.map(a => `
     <div class="manage-item">
       <div class="manage-item-icon">${a.emoji}</div>
-      <div class="manage-item-name">${a.name} <span class="badge ${a.type === 'reward' ? 'badge-reward' : 'badge-punish'}">${a.type === 'reward' ? 'Reward' : 'Hukuman'}</span></div>
+      <div class="manage-item-name">${a.name} <span class="badge ${a.type === 'reward' ? 'badge-reward' : 'badge-punish'}">${a.type === 'reward' ? '👍 Baik' : '👎 Buruk'}</span></div>
       <div class="manage-item-stars" style="${a.type === 'punishment' ? 'color:var(--danger)' : ''}">${a.type === 'punishment' ? '-' : '+'}${a.stars} ⭐</div>
-      <button class="btn-danger" onclick="removeActivity(${a.id})">Hapus</button>
+      <button class="btn-danger" data-action="removeActivity" data-id="${a.id}">Hapus</button>
     </div>`).join('');
   // Rewards
   const rl = document.getElementById('rwdManageList');
@@ -1474,7 +1551,7 @@ function renderAdminLists() {
       <div class="manage-item-icon">${r.emoji}</div>
       <div class="manage-item-name">${r.name}</div>
       <div class="manage-item-stars">${r.cost} ⭐</div>
-      <button class="btn-danger" onclick="removeReward(${r.id})">Hapus</button>
+      <button class="btn-danger" data-action="removeReward" data-id="${r.id}">Hapus</button>
     </div>`).join('');
 }
 
@@ -1487,10 +1564,10 @@ function promptActivity(id) {
   document.getElementById('confirmIcon').textContent = act.emoji;
   document.getElementById('confirmTitle').textContent = act.name;
   document.getElementById('confirmDesc').textContent =
-    `${isPun ? 'Hukuman' : 'Reward'} untuk ${child.name}: ${isPun ? '-' : '+'}${act.stars} ⭐`;
+    `${isPun ? '👎 Aktivitas Buruk' : '👍 Aktivitas Baik'} untuk ${child.name}: ${isPun ? '-' : '+'}${act.stars} ⭐`;
   const btn = document.getElementById('confirmYes');
   btn.className = `confirm-btn yes${isPun ? ' danger' : ''}`;
-  btn.textContent = isPun ? 'Catat Hukuman' : 'Catat Reward!';
+  btn.textContent = isPun ? 'Catat Aktivitas Buruk' : 'Catat Aktivitas Baik!';
   confirmCallback = () => doActivity(id);
   document.getElementById('confirmModal').classList.add('show');
 }
@@ -1682,17 +1759,98 @@ function doConfirm() {
   closeConfirm();
 }
 
+// ── CROP MODAL ────────────────────────────────────────────────
+let cropState = { src: null, offsetX: 0, offsetY: 0, zoom: 100, dragging: false, startX: 0, startY: 0, targetCallback: null };
+
+function openCropModal(src, callback) {
+  cropState.src = src;
+  cropState.offsetX = 0;
+  cropState.offsetY = 0;
+  cropState.zoom = 100;
+  cropState.targetCallback = callback;
+  const img = document.getElementById('cropImg');
+  img.src = src;
+  document.getElementById('cropZoom').value = 100;
+  updateCrop();
+  document.getElementById('cropModal').classList.add('show');
+}
+
+function updateCrop() {
+  const zoom = parseInt(document.getElementById('cropZoom').value);
+  cropState.zoom = zoom;
+  const img = document.getElementById('cropImg');
+  img.style.transform = `translate(${cropState.offsetX}px, ${cropState.offsetY}px) scale(${zoom/100})`;
+}
+
+function closeCrop() {
+  document.getElementById('cropModal').classList.remove('show');
+}
+
+function applyCrop() {
+  const img = document.getElementById('cropImg');
+  const container = img.parentElement;
+  const rect = container.getBoundingClientRect();
+  const size = rect.width;
+  const zoom = cropState.zoom / 100;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 300; canvas.height = 300;
+  const ctx = canvas.getContext('2d');
+
+  // Draw circle clip
+  ctx.beginPath();
+  ctx.arc(150, 150, 150, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Natural image size
+  const nw = img.naturalWidth, nh = img.naturalHeight;
+  // Rendered base size (contain in square)
+  const base = Math.min(size, size);
+  const scale = Math.min(base / nw, base / nh) * zoom;
+  const dw = nw * scale, dh = nh * scale;
+  const dx = (size / 2 - dw / 2) + cropState.offsetX * (300 / size);
+  const dy = (size / 2 - dh / 2) + cropState.offsetY * (300 / size);
+
+  ctx.drawImage(img, dx * (300 / size), dy * (300 / size), dw * (300 / size), dh * (300 / size));
+
+  const cropped = canvas.toDataURL('image/jpeg', 0.88);
+  closeCrop();
+  if (cropState.targetCallback) cropState.targetCallback(cropped);
+}
+
+// Drag to pan inside crop modal
+(function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const img = document.getElementById('cropImg');
+    if (!img) return;
+    let dragging = false, lx = 0, ly = 0;
+    const down = (x, y) => { dragging = true; lx = x; ly = y; };
+    const move = (x, y) => {
+      if (!dragging) return;
+      cropState.offsetX += (x - lx); cropState.offsetY += (y - ly);
+      lx = x; ly = y; updateCrop();
+    };
+    const up = () => { dragging = false; };
+    img.addEventListener('mousedown', e => { down(e.clientX, e.clientY); e.preventDefault(); });
+    document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+    document.addEventListener('mouseup', up);
+    img.addEventListener('touchstart', e => { const t = e.touches[0]; down(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchmove', e => { const t = e.touches[0]; move(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchend', up);
+  });
+})();
+
 // ── PHOTO UPLOAD ──────────────────────────────────────────────
 function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    newChildPhoto = e.target.result;
-    const preview = document.getElementById('newChildAvatarPreview');
-    if (preview) {
-      preview.innerHTML = `<img src="${newChildPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-    }
+    openCropModal(e.target.result, (cropped) => {
+      newChildPhoto = cropped;
+      const preview = document.getElementById('newChildAvatarPreview');
+      if (preview) preview.innerHTML = `<img src="${cropped}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    });
   };
   reader.readAsDataURL(file);
   event.target.value = '';
@@ -1713,22 +1871,83 @@ function editChildPhoto(id) {
 
 function handleEditPhotoUpload(event) {
   const file = event.target.files[0];
-  if (!file || !editingChildId) return;
+  if (!file) return;
+  const targetId = editingChildId;
+  editingChildId = null;
   const reader = new FileReader();
   reader.onload = e => {
-    const child = data.children.find(c => c.id === editingChildId);
-    if (child) {
-      child.photo = e.target.result;
-      save(); renderAll();
-      showToast('✅ Foto diperbarui!');
-    }
-    editingChildId = null;
+    openCropModal(e.target.result, (cropped) => {
+      const child = data.children.find(c => c.id === targetId);
+      if (child) {
+        child.photo = cropped;
+        save(); renderAll();
+        showToast('✅ Foto diperbarui!');
+      }
+    });
   };
   reader.readAsDataURL(file);
   event.target.value = '';
 }
 
 // ── ADMIN ────────────────────────────────────────────────────
+// Event delegation for admin list buttons — fixes bug where onclick
+// on dynamically rendered innerHTML loses reference after re-render
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const id = parseInt(btn.dataset.id);
+  if (action === 'removeChild') {
+    data.children = data.children.filter(c => c.id !== id);
+    if (selectedChild === id) selectedChild = data.children[0]?.id || null;
+    save(); renderAll();
+    showToast('✅ Anak dihapus');
+  } else if (action === 'removeActivity') {
+    data.activities = data.activities.filter(a => a.id !== id);
+    save(); renderAll();
+  } else if (action === 'removeReward') {
+    data.rewards = data.rewards.filter(r => r.id !== id);
+    save(); renderAll();
+  } else if (action === 'editChildPhoto') {
+    editingChildId = id;
+    document.getElementById('editPhotoInput')?.click();
+  }
+});
+
+let currentActType = 'reward';
+
+function switchActType(type) {
+  currentActType = type;
+  const isGood = type === 'reward';
+  const goodBtn = document.getElementById('actToggleGood');
+  const badBtn = document.getElementById('actToggleBad');
+  const label = document.getElementById('actStarsLabel');
+  const submitBtn = document.getElementById('actSubmitBtn');
+  if (goodBtn) {
+    goodBtn.style.background = isGood ? 'var(--primary)' : 'white';
+    goodBtn.style.color = isGood ? 'white' : 'var(--text-muted)';
+    goodBtn.style.borderColor = isGood ? 'var(--primary)' : 'var(--border)';
+  }
+  if (badBtn) {
+    badBtn.style.background = !isGood ? 'var(--danger)' : 'white';
+    badBtn.style.color = !isGood ? 'white' : 'var(--text-muted)';
+    badBtn.style.borderColor = !isGood ? 'var(--danger)' : 'var(--border)';
+  }
+  if (label) label.textContent = isGood ? 'Bintang didapat' : 'Bintang dikurangi';
+  if (submitBtn) submitBtn.style.background = isGood ? 'var(--primary)' : 'var(--danger)';
+}
+
+function addActivityUnified() {
+  const name = document.getElementById('actName').value.trim();
+  const stars = parseInt(document.getElementById('actStars').value);
+  if (!name || !stars || stars < 1) return showToast('⚠️ Isi nama dan jumlah bintang!');
+  data.activities.push({ id: data.nextId++, name, emoji: selectedActEmoji, stars, type: currentActType });
+  document.getElementById('actName').value = '';
+  document.getElementById('actStars').value = '';
+  save(); renderAll();
+  showToast(`✅ Aktivitas "${name}" ditambahkan!`);
+}
+
 function addChild() {
   const name = document.getElementById('newChildName').value.trim();
   const emoji = document.getElementById('newChildEmoji').value.trim() || '😊';
@@ -1745,30 +1964,9 @@ function addChild() {
   showToast(`✅ ${name} ditambahkan!`);
 }
 
-function removeChild(id) {
-  data.children = data.children.filter(c => c.id !== id);
-  if (selectedChild === id) selectedChild = data.children[0]?.id || null;
-  save(); renderAll();
-  showToast('✅ Anak dihapus');
-}
-
 function addActivity(type) {
-  const nameEl = type === 'reward' ? 'actName' : 'punName';
-  const starsEl = type === 'reward' ? 'actStars' : 'punStars';
-  const name = document.getElementById(nameEl).value.trim();
-  const stars = parseInt(document.getElementById(starsEl).value);
-  const emoji = type === 'reward' ? selectedActEmoji : selectedPunEmoji;
-  if (!name || !stars || stars < 1) return showToast('⚠️ Isi nama dan jumlah bintang!');
-  data.activities.push({ id: data.nextId++, name, emoji, stars, type });
-  document.getElementById(nameEl).value = '';
-  document.getElementById(starsEl).value = '';
-  save(); renderAll();
-  showToast(`✅ Aktivitas "${name}" ditambahkan!`);
-}
-
-function removeActivity(id) {
-  data.activities = data.activities.filter(a => a.id !== id);
-  save(); renderAll();
+  // legacy shim — kept for data compatibility
+  addActivityUnified();
 }
 
 function addReward() {
@@ -1782,17 +1980,11 @@ function addReward() {
   showToast(`✅ Hadiah "${name}" ditambahkan!`);
 }
 
-function removeReward(id) {
-  data.rewards = data.rewards.filter(r => r.id !== id);
-  save(); renderAll();
-}
-
 function selectEmoji(prefix, emoji, el) {
-  const pickId = prefix === 'act' ? 'actEmojiPick' : prefix === 'pun' ? 'punEmojiPick' : 'rwdEmojiPick';
+  const pickId = prefix === 'act' ? 'actEmojiPick' : 'rwdEmojiPick';
   document.querySelectorAll(`#${pickId} .emoji-opt`).forEach(e => e.classList.remove('selected'));
   el.classList.add('selected');
   if (prefix === 'act') selectedActEmoji = emoji;
-  else if (prefix === 'pun') selectedPunEmoji = emoji;
   else selectedRwdEmoji = emoji;
 }
 
@@ -1845,15 +2037,24 @@ function showToast(msg) {
 // ── INIT ──────────────────────────────────────────────────────
 renderAll();
 
+// Handle shortcut hash routing (dari manifest shortcuts)
+(function handleHash() {
+  const hash = window.location.hash;
+  if (hash === '#activities') showPage('page-activities');
+  else if (hash === '#rewards') showPage('page-rewards');
+  else if (hash === '#history') showPage('page-history');
+  else if (hash === '#leaderboard') showPage('page-leaderboard');
+})();
+
 // Tampilkan waktu backup terakhir (dari sesi sebelumnya)
-const lastBk = localStorage.getItem('bintangPintarLastBackup');
-if (lastBk) {
+const lastBkLabel = localStorage.getItem('bintangPintarLastBackupLabel');
+if (lastBkLabel) {
   const el = document.getElementById('lastBackupTime');
-  if (el) el.textContent = '✅ Backup terakhir (sesi lalu): ' + lastBk;
+  if (el) el.textContent = '✅ Backup terakhir: ' + lastBkLabel;
 }
 
-// Trigger auto-backup 5 detik setelah app dibuka (silent)
-setTimeout(() => autoBackup(), 5000);
+// Cek apakah sudah > 24 jam sejak backup terakhir → jalankan jika ya
+scheduleAutoBackupIfDue();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
